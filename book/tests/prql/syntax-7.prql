@@ -1,7 +1,4 @@
+# Error expected
+
 from employees
-group [title, country] (
-  aggregate [
-    average salary,
-    ct = count
-  ]
-)
+derive total_distance = sum distance

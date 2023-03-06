@@ -117,7 +117,7 @@ fn table_factor_of_table_ref(table_ref: TableRef, ctx: &mut Context) -> Result<T
     // ensure that the table is declared
     if let Some(sql_relation) = decl.relation.take() {
         // if we cannot use CTEs
-        if ctx.query.forbid_ctes {
+        if !ctx.query.allow_ctes {
             // restore relation for other references
             decl.relation = Some(sql_relation.clone());
 
@@ -167,6 +167,7 @@ fn table_factor_of_table_ref(table_ref: TableRef, ctx: &mut Context) -> Result<T
         },
         args: None,
         with_hints: vec![],
+        columns_definition: None,
     })
 }
 
@@ -284,7 +285,9 @@ fn sql_select_query_of_pipeline(
         .into_iter()
         .next();
     let group_by: Vec<CId> = aggregate.map(|(part, _)| part).unwrap_or_default();
+    ctx.query.allow_stars = ctx.dialect.stars_in_group();
     let group_by = try_into_exprs(group_by, ctx, None)?;
+    ctx.query.allow_stars = true;
 
     ctx.query.pre_projection = false;
 
@@ -426,7 +429,7 @@ fn sql_of_loop(pipeline: Vec<SqlTransform>, ctx: &mut Context) -> Result<Vec<Sql
 
     // compile step (without producing CTEs)
     ctx.push_query();
-    ctx.query.forbid_ctes = true;
+    ctx.query.allow_ctes = false;
 
     let step = query_to_set_expr(sql_query_of_pipeline(step, ctx)?, ctx);
 
@@ -458,6 +461,7 @@ fn sql_of_loop(pipeline: Vec<SqlTransform>, ctx: &mut Context) -> Result<Vec<Sql
                     alias: None,
                     args: None,
                     with_hints: Vec::new(),
+                    columns_definition: None,
                 },
                 joins: vec![],
             }],
