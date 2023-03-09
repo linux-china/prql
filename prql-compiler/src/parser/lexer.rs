@@ -20,7 +20,9 @@ pub enum Token {
     /// single-char control tokens
     Control(char),
 
-    Arrow,       // ->
+    // TODO: rename to ArrowThin
+    Arrow, // ->
+    // TODO: rename to ArrowFat
     ArrowDouble, // =>
     Eq,          // ==
     Ne,          // !=
@@ -51,7 +53,7 @@ pub fn lexer() -> impl Parser<char, Vec<(Token, std::ops::Range<usize>)>, Error 
 
     let ident = ident_part().map(Token::Ident);
 
-    let keyword = choice((just("func"), just("let"), just("switch"), just("prql")))
+    let keyword = choice((just("func"), just("let"), just("case"), just("prql")))
         .then_ignore(end_expr())
         .map(|x| x.to_string())
         .map(Token::Keyword);
