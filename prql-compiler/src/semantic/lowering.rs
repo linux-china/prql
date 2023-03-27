@@ -8,8 +8,7 @@ use itertools::Itertools;
 
 use crate::ast::pl::fold::AstFold;
 use crate::ast::pl::{
-    self, Expr, ExprKind, FrameColumn, Ident, InterpolateItem, Range, SwitchCase, TableExternRef,
-    Ty, WindowFrame,
+    self, Expr, ExprKind, FrameColumn, Ident, InterpolateItem, Range, SwitchCase, Ty, WindowFrame,
 };
 use crate::ast::rq::{self, CId, Query, RelationColumn, TId, TableDecl, Transform};
 use crate::error::{Error, Reason, Span};
@@ -52,6 +51,7 @@ pub fn lower_ast_to_ir(statements: Vec<pl::Stmt>, context: Context) -> Result<Qu
     })
 }
 
+#[derive(Debug)]
 struct Lowerer {
     cid: IdGenerator<CId>,
     tid: IdGenerator<TId>,
@@ -74,7 +74,7 @@ struct Lowerer {
     table_buffer: Vec<TableDecl>,
 }
 
-#[derive(Clone, EnumAsInner)]
+#[derive(Clone, EnumAsInner, Debug)]
 enum LoweredTarget {
     /// Lowered node was a computed expression.
     Compute(CId),
@@ -821,10 +821,8 @@ fn lower_table(lowerer: &mut Lowerer, table: context::TableDecl, fq_ident: Ident
             // a CTE
             (lowerer.lower_relation(*expr)?, Some(fq_ident.name))
         }
-        TableExpr::LocalTable => {
-            extern_ref_to_relation(columns, TableExternRef::LocalTable(fq_ident.name))
-        }
-        TableExpr::Param(id) => extern_ref_to_relation(columns, TableExternRef::Param(id)),
+        TableExpr::LocalTable => extern_ref_to_relation(columns, fq_ident.name),
+        TableExpr::Param(_) => unreachable!(),
     };
 
     log::debug!("lowering table {name:?}, columns = {:?}", relation.columns);
@@ -836,7 +834,7 @@ fn lower_table(lowerer: &mut Lowerer, table: context::TableDecl, fq_ident: Ident
 
 fn extern_ref_to_relation(
     mut columns: Vec<RelationColumn>,
-    extern_ref: TableExternRef,
+    extern_ref: String,
 ) -> (rq::Relation, Option<String>) {
     // put wildcards last
     columns.sort_by_key(|a| matches!(a, RelationColumn::Wildcard));

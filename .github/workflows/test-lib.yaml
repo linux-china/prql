@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       # We also run the tests for the libraries that depend on this, from their workflow files.
-      - "prql-lib/**"
+      - "bindings/prql-lib/**"
       - ".github/workflows/test-lib.yaml"
   workflow_call:
 
@@ -22,7 +22,7 @@ jobs:
       - name: 💰 Cache
         uses: Swatinem/rust-cache@v2
         with:
-          key: 0.6.0-${{ inputs.target_option }}
+          key: 0.6.0-
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Build
         uses: richb-hanover/cargo@v1.1.0

@@ -47,6 +47,7 @@
 
 - [Bindings](./bindings/README.md)
 
+  - [.NET](./bindings/dotnet.md)
   - [Elixir](./bindings/elixir.md)
   - [Java](./bindings/java.md)
   - [JavaScript](./bindings/javascript.md)
@@ -58,6 +59,7 @@
 
   - [dbt](./integrations/dbt.md)
   - [Jupyter](./integrations/jupyter.md)
+  - [DuckDB](./integrations/duckdb.md)
   - [Prefect](./integrations/prefect.md)
   - [VS Code](./integrations/vscode.md)
   - [Rill](./integrations/rill.md)
@@ -78,6 +80,7 @@
 - [Internals](./internals/README.md)
 
   - [Compiler architecture](./internals/compiler-architecture.md)
+  - [Helpers](./internals/helpers.md)
   - [Name resolving](./internals/name-resolving.md)
   - [Functions](./internals/functional-lang.md)
   - [Syntax highlighting](./internals/syntax-highlighting.md)

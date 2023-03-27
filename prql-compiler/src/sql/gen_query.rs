@@ -417,8 +417,9 @@ fn sql_of_loop(pipeline: Vec<SqlTransform>, ctx: &mut Context) -> Result<Vec<Sql
     let step = anchor_split(&mut ctx.anchor, initial, step);
     let from = step.first().unwrap().as_super().unwrap().as_from().unwrap();
 
+    let table_name = "_loop";
     let initial = ctx.anchor.table_decls.get_mut(&from.source).unwrap();
-    initial.name = Some("loop".to_string());
+    initial.name = Some(table_name.to_string());
     let initial_relation = initial.relation.take().unwrap();
 
     let initial = initial_relation.kind.into_preprocessed_pipeline().unwrap();
@@ -436,7 +437,7 @@ fn sql_of_loop(pipeline: Vec<SqlTransform>, ctx: &mut Context) -> Result<Vec<Sql
 
     // build CTE and it's SELECT
     let cte = sql_ast::Cte {
-        alias: simple_table_alias(Ident::new("loop")),
+        alias: simple_table_alias(Ident::new(table_name)),
         query: Box::new(default_query(SetExpr::SetOperation {
             op: sql_ast::SetOperator::Union,
             set_quantifier: sql_ast::SetQuantifier::All,
@@ -456,7 +457,7 @@ fn sql_of_loop(pipeline: Vec<SqlTransform>, ctx: &mut Context) -> Result<Vec<Sql
             )],
             from: vec![TableWithJoins {
                 relation: TableFactor::Table {
-                    name: sql_ast::ObjectName(vec![Ident::new("loop")]),
+                    name: sql_ast::ObjectName(vec![Ident::new(table_name)]),
                     alias: None,
                     args: None,
                     with_hints: Vec::new(),
@@ -783,9 +784,27 @@ mod test {
         )
         "#;
 
-        let sql_ast = crate::test::compile(query).unwrap();
+        let sql_ast = crate::tests::compile(query).unwrap();
 
-        assert_snapshot!(sql_ast);
+        assert_snapshot!(sql_ast, @r###"
+        WITH table_1 AS (
+          SELECT
+            title,
+            AVG(salary) AS _expr_0
+          FROM
+            employees
+          GROUP BY
+            title,
+            emp_no
+        )
+        SELECT
+          title,
+          AVG(_expr_0) AS avg_salary
+        FROM
+          table_1 AS table_0
+        GROUP BY
+          title
+        "###);
     }
 
     #[test]
@@ -806,7 +825,7 @@ mod test {
         derive rank = rank
         "#;
 
-        let sql_ast = crate::test::compile(query).unwrap();
+        let sql_ast = crate::tests::compile(query).unwrap();
 
         assert_snapshot!(sql_ast, @r###"
         WITH table_1 AS (
@@ -834,7 +853,7 @@ mod test {
         filter (average bar) > 3
         "#;
 
-        assert_snapshot!(crate::test::compile(query).unwrap(), @r###"
+        assert_snapshot!(crate::tests::compile(query).unwrap(), @r###"
         WITH table_1 AS (
           SELECT
             *,
