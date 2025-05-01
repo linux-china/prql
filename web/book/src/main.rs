@@ -1,16 +1,11 @@
-// All copied from `mdbook_preprocessor_boilerplate` apart from the function
-// which does the replacement.
-// This file is licensed under GPL-3.0 then. We don't link against it from PRQL.
-
 // We don't need to run this with wasm, and the features that `mdbook` uses of
 // `clap`'s don't support wasm.
 #[cfg(not(target_family = "wasm"))]
 fn main() {
-    use mdbook_prql::{run, ComparisonPreprocessor};
-    eprintln!("Running comparison preprocessor");
+    use mdbook_preprocessor_boilerplate::run;
+    use mdbook_prql::ComparisonPreprocessor;
     run(
         ComparisonPreprocessor,
-        "comparison-preprocessor",
         "Create comparison examples between PRQL & SQL",
     );
 }

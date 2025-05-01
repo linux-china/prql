@@ -6,23 +6,28 @@ Here are some of the most common questions we hear. Have something else you'd
 like to ask? Pop by our [Discord](https://discord.com/invite/eQcfaCmsNc) and ask
 away!
 
-{{< faq "Cool story Hansel, but what can I actually do with PRQL now?" >}}
+{{< faq "Cool story Hansel, but what can I actually do with PRQL _now_?" >}}
 
-We're still early, and the opportunities for using PRQL are focused on two
-integrations:
+PRQL is ready to use by the intrepid, either with our supported integrations, or
+within your own tools, using one of our supported language bindings. The easiest
+way is with our integrations:
 
-- **[dbt-prql](https://github.com/prql/dbt-prql)** allows writing PRQL in
-  [dbt](https://www.getdbt.com/) models. It very simple to use — install
-  `dbt-prql` with pip, and then any text between a `{% prql %}` &
-  `{% endprql %}` tag is compiled from PRQL.
+- **Prototype your PRQL queries** in the
+  [Playground](https://prql-lang.org/playground/) or the
+  [VS Code extension](https://marketplace.visualstudio.com/items?itemName=PRQL-lang.prql-vscode)
+  and copy/paste the resulting SQL into your database. It's not the perfect
+  workflow, but it's easy to get started.
 - **[Jupyter](https://pyprql.readthedocs.io/en/latest/magic_readme.html)**
   allows writing PRQL in a Jupyter notebook or IPython repl, with a `%%prql`
   magic. As well as connecting to existing DBs, our integration with DuckDB
   enables querying pandas dataframes, CSVs & Parquet files, and writing the
   output to a dataframe.
+- **[DuckDB extension](https://github.com/ywelsch/duckdb-prql)** — is a DuckDB
+  extension which allows querying a DuckDB instance with PRQL.
 
-Beyond these two integrations, it's very easy to add PRQL to your own apps with
-our [bindings](/#bindings) for Rust, Python & JS.
+It's also possible to query PRQL from your code with our [bindings](/#bindings)
+for R, Rust, Python & JS. For an example of using PRQL with DuckDB, check out
+[Querying with PRQL](https://eitsupi.github.io/querying-with-prql/).
 
 {{</ faq >}}
 
@@ -34,16 +39,20 @@ Yes, probably. We're standing on the shoulders of giants:
   data, in R. It's very similar to PRQL. It only works on in-memory R data.
   - There's also [dbplyr](https://dbplyr.tidyverse.org/) which compiles a subset
     of dplyr to SQL, though requires an R runtime.
-- [Kusto](https://docs.microsoft.com/azure/data-explorer/kusto/query/samples?pivots=azuredataexplorer)
+- [Kusto](https://learn.microsoft.com/en-us/kusto/query/tutorials/learn-common-operators?view=azure-data-explorer&preserve-view=true&pivots=azuredataexplorer)
   is also a beautiful pipelined language, similar to PRQL. But it can only use
   Kusto-compatible DBs.
+  <!-- We can add more articles by linking from works in the "There are other similar piecs out there" sentence -->
 - [Against SQL](https://www.scattered-thoughts.net/writing/against-sql/) gives a
   fairly complete description of SQL's weaknesses, both for analytical and
   transactional queries. [**@jamii**](https://github.com/jamii) consistently
-  writes insightful pieces, and it's worth sponsoring him for his updates.
+  writes insightful pieces, and it's worth sponsoring him for his updates. There
+  are
+  [other](https://buttondown.email/jaffray/archive/sql-scoping-is-surprisingly-subtle-and-semantic/)
+  similar pieces out there.
 - Julia's [DataPipes.jl](https://gitlab.com/aplavin/DataPipes.jl) &
   [Chain.jl](https://github.com/jkrumbiegel/Chain.jl) demonstrate how effective
-  point-free pipelines can be, and how line-breaks can work as pipes.
+  point-free pipelines can be, and how line breaks can work as pipes.
 - [OCaml](https://ocaml.org/)'s elegant and simple syntax serves as inspiration.
 
 And there are many projects similar to PRQL:
@@ -64,9 +73,9 @@ And there are many projects similar to PRQL:
   contains many of the criticisms of SQL that inspired PRQL.
 - [FunSQL.jl](https://github.com/MechanicalRabbit/FunSQL.jl) is a library in
   Julia which compiles a nice query syntax to SQL. It requires a Julia runtime.
-- [LINQ](https://docs.microsoft.com/dotnet/csharp/linq/write-linq-queries), is a
-  pipelined language for the `.NET` ecosystem which can (mostly) compile to SQL.
-  It was one of the first languages to take this approach.
+- [LINQ](https://learn.microsoft.com/en-us/dotnet/csharp/linq/get-started/write-linq-queries),
+  is a pipelined language for the `.NET` ecosystem which can (mostly) compile to
+  SQL. It was one of the first languages to take this approach.
 - [Sift](https://github.com/RCHowell/Sift) is an experimental language which
   heavily uses pipes and relational algebra.
 
@@ -113,13 +122,15 @@ PRQL compiles to SQL, so it's compatible with any database that accepts SQL.
 
 A query's dialect can be explicitly specified, allowing for dialect-specific SQL
 to be generated. See the
-[Dialect docs](https://prql-lang.org/book/language-features/target.html) for
-more info; note that there is currently very limited implementation of this, and
-most dialects' implementation are identical to a generic implementation.
+[Dialect docs](https://prql-lang.org/book/project/target.html) for more info;
+note that there is currently very limited implementation of this, and most
+dialects' implementation are identical to a generic implementation.
 
 {{</ faq >}}
 
-{{< faq "What's going on with this `aggregate` function? What's wrong with `SELECT` & `GROUP BY`?" >}}
+{{< faq "What's this `aggregate` function?" >}}
+
+**...and why not just use `SELECT` & `GROUP BY`?**
 
 SQL uses `SELECT` for all of these:
 
@@ -182,14 +193,21 @@ While you should be skeptical of new claims from new entrants
 [commented](https://news.ycombinator.com/item?id=30067406) in a discussion on
 PRQL:
 
-<!-- TODO: the `>` doesn't seem to format on the website  -->
-
-> "FWIW the separate `group_by()` is one of my greatest design regrets with
-> dplyr — I wish I had made `by` a parameter of `summarise()`, `mutate()`,
-> `filter()` etc."
+> FWIW the separate `group_by()` is one of my greatest design regrets with dplyr
+> — I wish I had made `by` a parameter of `summarise()`, `mutate()`, `filter()`
+> etc.
 
 For more detail, check out the docs in the
-[PRQL Book](https://prql-lang.org/book).
+[PRQL Book](https://prql-lang.org/book/reference/stdlib/transforms/aggregate.html).
+
+{{</ faq >}}
+
+{{< faq "Can PRQL write to databases?" >}}
+
+PRQL is focused on analytical queries, so we don't currently support writing or
+modifying data in databases. However, PRQL queries can be used to generate SQL
+statements that write to databases. For example, surround the SQL output of a
+PRQL query in `CREATE OR REPLACE TABLE foo AS (...)`.
 
 {{</ faq >}}
 
@@ -203,6 +221,6 @@ because of a strong convention around lowercase, but everywhere else we use
 
 {{< faq "Where can I find the logos?" >}}
 
-See the [press material](../press-material).
+See our [press materials](https://github.com/PRQL/prql-brand).
 
 {{</ faq >}}

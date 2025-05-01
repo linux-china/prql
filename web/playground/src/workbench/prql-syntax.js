@@ -13,10 +13,10 @@ const TRANSFORMS = [
   "union",
   "window",
 ];
+const MODULES = ["date", "math", "text"];
 const BUILTIN_FUNCTIONS = ["case"]; // "in", "as"
-const KEYWORDS = ["func", "let", "prql"];
+const KEYWORDS = ["let", "prql"];
 const LITERALS = ["null", "true", "false"];
-const OPERATORS = ["and", "or"]; // "not"
 
 const def = {
   // Set defaultToken to invalid to see what you do not tokenize yet
@@ -24,19 +24,20 @@ const def = {
 
   keywords: [
     ...TRANSFORMS,
+    ...MODULES,
     ...BUILTIN_FUNCTIONS,
     ...KEYWORDS,
     ...LITERALS,
-    ...OPERATORS,
   ],
 
   operators: [
+    "+",
     "-",
     "*",
     "/",
+    "//",
     "%",
-    "+",
-    "-",
+    // "**",
     "==",
     "!=",
     "->",
@@ -45,6 +46,9 @@ const def = {
     "<",
     ">=",
     "<=",
+    "~=",
+    "&&",
+    "||",
     "??",
   ],
 

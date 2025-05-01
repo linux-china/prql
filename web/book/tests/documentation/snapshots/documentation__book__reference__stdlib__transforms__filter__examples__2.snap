@@ -1,0 +1,10 @@
+---
+source: web/book/tests/documentation/book.rs
+expression: "from employees\nfilter (department | in [\"IT\", \"HR\"])\n"
+---
+SELECT
+  *
+FROM
+  employees
+WHERE
+  department IN ('IT', 'HR')
